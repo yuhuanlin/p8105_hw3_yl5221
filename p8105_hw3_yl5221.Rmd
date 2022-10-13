@@ -44,4 +44,40 @@ instacart %>%
   count(order_id)
 ```
 
+#### Number of aisles and most popular aisles.
+
+There are 134 aisles. The top three popular aisles are fresh vegetables, fresh fruits, packaged vegetables fruits.
+```{r}
+instacart %>% 
+  group_by(aisle) %>%
+  summarize(n_obs = n()) %>% 
+  arrange(desc(n_obs))
+```
+
+#### Plot showing the number of items ordered in each aisle
+```{r}
+instacart %>% 
+  group_by(aisle_id, aisle) %>%
+  summarize(n_obs = n()) %>% 
+  filter(n_obs > 10000) %>%
+  ggplot(aes(x = aisle_id, y = n_obs, color = aisle)) +
+  geom_point() +
+  labs(
+    title = "Aisles v.s Order number",
+    x = "Aisle_id",
+    y = "Number of items ordered"
+  ) 
+```
+
+
+#### Table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. 
+
+```{r}
+instacart %>% 
+  group_by(aisle, product_name) %>% 
+  summarize(n_obs = n()) %>% 
+  filter(aisle == "baking ingredients" | aisle =="dog food care" |aisle == "packaged vegetables fruits") %>% 
+  mutate(rank = min_rank(desc(n_obs))) %>% 
+  filter(rank < 4)
+```
 
