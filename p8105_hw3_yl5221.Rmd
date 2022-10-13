@@ -81,3 +81,18 @@ instacart %>%
   filter(rank < 4)
 ```
 
+#### Table showing mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day
+```{r}
+instacart %>% 
+    mutate(order_hour_of_day= as.integer(order_hour_of_day)) %>% 
+    select(product_name, order_dow, order_hour_of_day) %>% 
+    filter(product_name == "Pink Lady Apples" | product_name == "Coffee Ice Cream") %>% 
+    group_by(product_name, order_dow) %>% 
+    summarize(mean_order = mean(order_hour_of_day)) %>% 
+    pivot_wider(
+    names_from = order_dow,
+    values_from = mean_order) 
+```
+
+
+
