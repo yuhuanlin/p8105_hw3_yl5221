@@ -94,5 +94,21 @@ instacart %>%
     values_from = mean_order) 
 ```
 
+## Problem 2
+
+I cleaned the column names, created a column indicating "weekday" and "weekend", and perform pivot longer to "activity." columns. Now I have 6 colunms - "week", "day", "day_id", "day_of_week", "hour", "counts". There's 50400 observations of 6 variables. 
+```{r}
+accel_df =
+  read_csv("./data/accel_data.csv") %>% 
+  janitor::clean_names() %>% 
+  mutate(day_of_week = ifelse(day == "Saturday", "weekend", ifelse(day == "Sunday", "weekend", "weekday"))) %>% 
+  pivot_longer(
+    starts_with("activity"),
+    names_to = "hour",
+    values_to = "counts"
+  )
+```
+
+
 
 
