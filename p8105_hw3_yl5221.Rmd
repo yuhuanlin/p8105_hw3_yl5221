@@ -104,7 +104,7 @@ accel_df =
   mutate(day_of_week = ifelse(day == "Saturday", "weekend", ifelse(day == "Sunday", "weekend", "weekday"))) %>% 
   pivot_longer(
     starts_with("activity"),
-    names_to = "hour",
+    names_to = "minute",
     values_to = "counts"
   )
 ```
@@ -120,16 +120,16 @@ accel_df %>%
   arrange(week, sum)
 ```
  
-Graph presenting activity counts for each day 
-
+#### Graph presenting activity counts for each day 
+Trends of graph: Most of Wednesday's and Tuesday's activity counts are low compared to counts on other days. There's also trend of one week of high counts followed by one week of low counts.
 ```{r}
 accel_df %>% 
-  ggplot(aes(x = day_id, y = counts, color = day)) +
-  geom_point() +
+  ggplot(aes(x = minute, y = counts, color = day)) +
+  geom_point(alpha = 0.5) +
     labs(
-    title = "Day v.s Activity Counts",
-    x = "day_id",
-    y = "counts of activity"
+    title = "Minute v.s Activity Counts",
+    x = "Minute",
+    y = "Counts of Activity"
   ) 
 ```
 
