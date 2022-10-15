@@ -106,7 +106,10 @@ accel_df =
     starts_with("activity"),
     names_to = "minute",
     values_to = "counts"
-  )
+  ) %>% 
+  separate(minute, into = c("activity", "minute"), sep = "_") %>% 
+  select(-activity) %>% 
+  mutate(minute = as.numeric(minute))
 ```
 
 #### Total activity variable for each day
@@ -129,16 +132,88 @@ accel_df %>%
     labs(
     title = "Minute v.s Activity Counts",
     x = "Minute",
-    y = "Counts of Activity"
-  ) 
+    y = "Counts of Activity",
+    caption = "Data from the accel dataset"
+  ) +
+  scale_x_discrete(
+    breaks = c(0, 360, 720, 1080, 1440),
+    labels = c("12AM", "6AM", "12PM", "6PM", "11:59PM"),
+    limits = c(0, 1440)
+  )
 ```
 
 
 ## Problem 3
 
-Data load in and description
+#### Data load in and description
+This data set contains 2595176 observations of 7 variables. 
+
+id: Weather station ID
+date: Date of observation
+prcp: Precipitation (tenths of mm)
+snow: Snowfall (mm)
+snwd: Snow depth (mm)
+tmax: Maximum temperature (tenths of degrees C)
+tmin: Minimum temperature (tenths of degrees C)
+
+There's a lack of data in some weather stations in the table. We have most missing values on tmin and tmax. For tmax and tmin, missing values are around 44% of all data. We have a little loss in precipitation, 15% loss for snowfall, and 23% for snow depth data.
+
 ```{r}
 library(p8105.datasets)
 data("ny_noaa")
+```
+
+```{r}
+ny_noaa %>% 
+ summarize(
+  missing_prcp = mean(is.na(prcp)),
+  missing_snow = mean(is.na(snow)),
+  missing_snwd = mean(is.na(snwd)),
+  missing_tmax = mean(is.na(tmax)),
+  missing_tmin = mean(is.na(tmin))
+) %>% 
+  knitr::kable()
+```
+
+```{r}
+str(ny_noaa)
+```
+
+```{r}
+ny_noaa =
+  ny_noaa %>% 
+  separate(date, into = c("year", "month", "day"), sep = "-") %>% 
+  mutate(
+    prcp = prcp/10,
+    tmax = as.numeric(tmax)/10, 
+    tmin = as.numeric(tmin)/10) 
+```
+
+The most common snowfall amount is 0. Because in NY state, there's no snow on most days.
+```{r}
+ny_noaa %>% 
+  count(snow) %>% 
+  arrange(desc(n))
+```
+
+The average max temperature in Jan is between -10°C to 10°C. There's some outliers when max temperature in Jan drops below -10°C. The average max temperature in Jul is between 20°C and 35°C. There's some outliers when max temperature in Jul falls between 10°C to 20°C.
+```{r}
+ny_noaa %>% 
+  filter(month == "01" | month == "07") %>% 
+  group_by(id, year, month) %>% 
+  summarize(mean_tmax = mean(tmax, na.rm = TRUE)) %>% 
+  ggplot(aes(x = year, y = mean_tmax, color = month)) +
+  geom_point(alpha = .2) +
+  geom_smooth(alpha = .5) +
+  labs(
+    title = "mean_tmax in Jan and Jul across years",
+    x = "Station id",
+    y = "temp(°C)",
+    caption = "Data from the noaa dataset"
+  ) +
+  scale_x_discrete(
+    breaks = c(1980, 1985, 1990, 1995, 2000, 2005, 2010)
+    ) +
+  facet_grid(~month) 
 ```
 
