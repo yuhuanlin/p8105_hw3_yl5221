@@ -109,6 +109,36 @@ accel_df =
   )
 ```
 
+#### Total activity variable for each day
+
+For week 1,2. There's increasing trend of summation of activity counts from Monday to Sunday.
+
+```{r}
+accel_df %>% 
+  group_by(week, day) %>% 
+  summarize(sum = sum(counts)) %>% 
+  arrange(week, sum)
+```
+ 
+Graph presenting activity counts for each day 
+
+```{r}
+accel_df %>% 
+  ggplot(aes(x = day_id, y = counts, color = day)) +
+  geom_point() +
+    labs(
+    title = "Day v.s Activity Counts",
+    x = "day_id",
+    y = "counts of activity"
+  ) 
+```
 
 
+## Problem 3
+
+Data load in and description
+```{r}
+library(p8105.datasets)
+data("ny_noaa")
+```
 
