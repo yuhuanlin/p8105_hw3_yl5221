@@ -124,7 +124,7 @@ accel_df %>%
 ```
  
 #### Graph presenting activity counts for each day 
-Trends of graph: Most of Wednesday's and Tuesday's activity counts are low compared to counts on other days. There's also trend of one week of high counts followed by one week of low counts.
+Trends of graph: Most of Wednesday's and Tuesday's activity counts are low compared to counts on other days. There's also trend of low activity counts between 10pm to 6am, during sleep time. And there's high activity counts in the morning and afternoon.
 ```{r}
 accel_df %>% 
   ggplot(aes(x = minute, y = counts, color = day)) +
@@ -148,13 +148,13 @@ accel_df %>%
 #### Data load in and description
 This data set contains 2595176 observations of 7 variables. 
 
-id: Weather station ID
-date: Date of observation
-prcp: Precipitation (tenths of mm)
-snow: Snowfall (mm)
-snwd: Snow depth (mm)
-tmax: Maximum temperature (tenths of degrees C)
-tmin: Minimum temperature (tenths of degrees C)
+*id: Weather station ID
+*date: Date of observation
+*prcp: Precipitation (tenths of mm)
+*snow: Snowfall (mm)
+*snwd: Snow depth (mm)
+*tmax: Maximum temperature (tenths of degrees C)
+*tmin: Minimum temperature (tenths of degrees C)
 
 There's a lack of data in some weather stations in the table. We have most missing values on tmin and tmax. For tmax and tmin, missing values are around 44% of all data. We have a little loss in precipitation, 15% loss for snowfall, and 23% for snow depth data.
 
@@ -175,10 +175,7 @@ ny_noaa %>%
   knitr::kable()
 ```
 
-```{r}
-str(ny_noaa)
-```
-
+#### Data cleaning
 ```{r}
 ny_noaa =
   ny_noaa %>% 
@@ -196,6 +193,7 @@ ny_noaa %>%
   arrange(desc(n))
 ```
 
+#### Average max temperature in January and in July in each station across years plot
 The average max temperature in Jan is between -10°C to 10°C. There's some outliers when max temperature in Jan drops below -10°C. The average max temperature in Jul is between 20°C and 35°C. There's some outliers when max temperature in Jul falls between 10°C to 20°C.
 ```{r}
 ny_noaa %>% 
@@ -216,4 +214,39 @@ ny_noaa %>%
     ) +
   facet_grid(~month) 
 ```
+
+
+#### tmax vs tmin and distribution of snowfall values
+```{r}
+tmax_tmin_plot =
+ny_noaa %>% 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_hex() +
+  geom_smooth() +
+  labs(
+    title = "tmin v.s tmax",
+    x = "Min temp(°C)",
+    y = "Max temp(°C)",
+    caption = "Data from the noaa dataset"
+  )
+```
+
+
+```{r}
+snowfall_plot =
+  ny_noaa %>% 
+  filter(snow > 0, snow < 100) %>% 
+  ggplot(aes(x = snow, y = factor(year), fill = stat(x))) +
+  ggridges::geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01, alpha = 0.5) +
+  labs(
+    title = "NY Snowfall Amount",
+    x = "Snowfall(mm)",
+    y = "year"
+  ) 
+```
+
+```{r}
+tmax_tmin_plot + snowfall_plot
+```
+
 
